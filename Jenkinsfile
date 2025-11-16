@@ -1,35 +1,32 @@
 pipeline {
-    agent any  // Indica que el pipeline puede ejecutarse en cualquier nodo disponible
-
-    tools {
-        maven 'Pipeline Maven Integration'  // Usa el nombre de la instalación de Maven configurada en Jenkins
-    }
+    agent any
 
     stages {
-        // Etapa de Build: Compilación del código
+        stage('Checkout Code') {
+            steps {
+                git 'https://github.com/Parth2k3/test-flask'  // URL de tu repositorio
+            }
+        }
+
         stage('Build') {
             steps {
-                echo 'Compilando el código...'
-                sh 'mvn clean install'  // Ejecuta Maven para compilar el proyecto
+                sh 'echo "building the app"'  // Agrega aquí el comando de construcción de tu aplicación (p.ej., mvn clean install para Maven)
             }
         }
 
-        // Etapa de Test: Ejecuta las pruebas unitarias
         stage('Test') {
             steps {
-                echo 'Ejecutando pruebas unitarias...'
-                sh 'mvn test'  // Ejecuta las pruebas con Maven
+                sh 'echo "Running tests"'  // Agrega aquí el comando para ejecutar tus pruebas, p.ej., mvn test o pytest
             }
         }
 
-        // Etapa de Deploy: Despliega el código en un entorno de prueba (Docker o servidor local)
         stage('Deploy') {
             steps {
-                echo 'Desplegando la aplicación en Docker...'
-                sh 'docker-compose up -d'  // Si estás usando Docker, ejecuta el despliegue
+                sh 'echo "deploying"'  // Agrega aquí el comando para desplegar tu aplicación (p.ej., un script de despliegue)
             }
         }
     }
+}
 
     post {
         success {
