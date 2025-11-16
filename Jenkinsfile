@@ -1,6 +1,10 @@
 pipeline {
     agent any  // Indica que el pipeline puede ejecutarse en cualquier nodo disponible
 
+    tools {
+        maven 'Pipeline Maven Integration'  // Usa el nombre de la instalación de Maven configurada en Jenkins
+    }
+
     stages {
         // Etapa de Build: Compilación del código
         stage('Build') {
