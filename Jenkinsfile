@@ -4,29 +4,28 @@ pipeline {
     stages {
         stage('Checkout Code') {
             steps {
-                git 'https://github.com/Parth2k3/test-flask'  // URL de tu repositorio
+                git 'https://github.com/madecaro/Proyecto-Gestion-Software'  // URL de tu repositorio
             }
         }
 
         stage('Build') {
             steps {
-                sh 'echo "building the app"'  // Agrega aquí el comando de construcción de tu aplicación (p.ej., mvn clean install para Maven)
+                sh 'echo "building the app"'  // Reemplaza con el comando adecuado de construcción
             }
         }
 
         stage('Test') {
             steps {
-                sh 'echo "Running tests"'  // Agrega aquí el comando para ejecutar tus pruebas, p.ej., mvn test o pytest
+                sh 'echo "Running tests"'  // Reemplaza con el comando para ejecutar las pruebas
             }
         }
 
         stage('Deploy') {
             steps {
-                sh 'echo "deploying"'  // Agrega aquí el comando para desplegar tu aplicación (p.ej., un script de despliegue)
+                sh 'echo "Deploying the app"'  // Reemplaza con el comando para desplegar
             }
         }
     }
-}
 
     post {
         success {
