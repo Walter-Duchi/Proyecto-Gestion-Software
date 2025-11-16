@@ -4,30 +4,29 @@ pipeline {
     stages {
         stage('Checkout Code') {
             steps {
-                git branch: 'main', 
-                    url: 'https://github.com/madecaro/Proyecto-Gestion-Software',
+                git branch: 'main', url: 'https://github.com/madecaro/Proyecto-Gestion-Software' 
             }
         }
 
         stage('Build') {
             steps {
-                sh 'echo "building the app"'  // Reemplaza con el comando adecuado de construcción
+                sh 'echo "building the app"'  // Aquí puedes agregar tu comando de compilación
             }
         }
 
         stage('Test') {
             steps {
-                sh 'echo "Running tests"'  // Reemplaza con el comando para ejecutar las pruebas
+                sh 'echo "Running tests"'  // Aquí puedes agregar el comando para ejecutar tus pruebas
             }
         }
 
         stage('Deploy') {
             steps {
-                sh 'echo "Deploying the app"'  // Reemplaza con el comando para desplegar
+                sh 'echo "deploying"'  // Aquí puedes agregar tu comando de despliegue
             }
         }
     }
-
+    
     post {
         success {
             echo 'Pipeline completado con éxito.'
@@ -37,3 +36,4 @@ pipeline {
         }
     }
 }
+
