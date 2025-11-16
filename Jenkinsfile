@@ -4,7 +4,8 @@ pipeline {
     stages {
         stage('Checkout Code') {
             steps {
-                git 'https://github.com/madecaro/Proyecto-Gestion-Software'  // URL de tu repositorio
+                git branch: 'main', 
+                    url: 'https://github.com/madecaro/Proyecto-Gestion-Software',
             }
         }
 
