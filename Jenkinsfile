@@ -1,62 +1,52 @@
 pipeline {
     agent any
-
-    environment {
-        IMAGE_NAME = 'jenkins/jenkins:lts-jdk17'  // Nombre de tu imagen Docker
-        CONTAINER_NAME = 'fervent_lumiere'  // Nombre del contenedor Docker
-    }
+    
+    // 1. Configuración de Herramientas: 'M3'  Debe estar configurado en Global Tool Configuration
+    tools {
+    maven 'M3' 
+    jdk 'JDK_23' 
+}
 
     stages {
-        stage('Checkout Code') {
-            steps {
-                // Descargar el código del repositorio
-                git branch: 'main', url: 'https://github.com/madecaro/Proyecto-Gestion-Software'
-            }
-        }
-
+        // Build: Compila el código
         stage('Build') {
             steps {
-                script {
-                    // Construir la imagen Docker
-                    echo "Construyendo la imagen Docker..."
-                    sh 'docker build -t ${IMAGE_NAME} .'
-                }
+                echo 'Iniciando compilación...'
+                sh 'mvn clean compile'
             }
         }
 
+        // Test: Ejecuta las pruebas unitarias
         stage('Test') {
             steps {
-                script {
-                    // Ejecutar las pruebas dentro de un contenedor Docker
-                    echo "Ejecutando pruebas unitarias en Docker..."
-                    sh 'docker run --rm ${IMAGE_NAME} ./ruta/a/tus/pruebas'  // Ajusta el comando según cómo ejecutes las pruebas
+                echo 'Ejecutando pruebas unitarias...'
+                sh 'mvn test'
+            }
+            post {
+                always {
+                    // Publica los resultados JUnit como evidencia
+                    junit '**/target/surefire-reports/*.xml'
                 }
             }
         }
 
-        stage('Deploy') {
+        // Package: Crea el artefacto JAR/WAR
+        stage('Package') {
             steps {
-                script {
-                    // Desplegar la aplicación en un contenedor Docker
-                    echo "Desplegando la aplicación en Docker..."
-
-                    // Detener y eliminar el contenedor si ya existe
-                    sh 'docker stop ${CONTAINER_NAME} || true'
-                    sh 'docker rm ${CONTAINER_NAME} || true'
-
-                    // Ejecutar el contenedor en segundo plano
-                    sh 'docker run -d --name ${CONTAINER_NAME} -p 8080:8080 ${IMAGE_NAME}'
-                }
+                echo 'Empaquetando artefacto...'
+                sh 'mvn package -DskipTests'
             }
         }
-    }
 
-    post {
-        success {
-            echo 'Pipeline completado con éxito.'
+        // Deploy: Despliegue en entorno de prueba local
+        stage('Deploy (Local)') {
+            steps {
+                echo 'Desplegando aplicación en entorno de prueba local...'
+                // Crea la carpeta 'deploy' y mueve el JAR generado
+                sh 'mkdir -p deploy'
+                sh 'cp target/*.jar deploy/'
+                echo 'Despliegue completado en la carpeta /deploy.'
+            }
         }
-        failure {
-            echo 'El pipeline falló.'
-        }
-    }
-}
+    }}
+
