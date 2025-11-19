@@ -1,13 +1,13 @@
 pipeline {
     agent any
-    
-    // 1. Configuración de Herramientas: 'M3'  Debe estar configurado en Global Tool Configuration
+
     tools {
-    maven 'M3' 
-}
+        maven 'M3'
+    }
 
     stages {
-        // Build: Compila el código
+
+        // Build
         stage('Build') {
             steps {
                 echo 'Iniciando compilación...'
@@ -15,7 +15,7 @@ pipeline {
             }
         }
 
-        // Test: Ejecuta las pruebas unitarias
+        // Test
         stage('Test') {
             steps {
                 echo 'Ejecutando pruebas unitarias...'
@@ -23,13 +23,12 @@ pipeline {
             }
             post {
                 always {
-                    // Publica los resultados JUnit como evidencia
                     junit '**/target/surefire-reports/*.xml'
                 }
             }
         }
 
-        // Package: Crea el artefacto JAR/WAR
+        // Package
         stage('Package') {
             steps {
                 echo 'Empaquetando artefacto...'
@@ -37,14 +36,77 @@ pipeline {
             }
         }
 
-        // Deploy: Despliegue en entorno de prueba local
+        // Deploy Local
         stage('Deploy (Local)') {
             steps {
                 echo 'Desplegando aplicación en entorno de prueba local...'
-                // Crea la carpeta 'deploy' y mueve el JAR generado
                 sh 'mkdir -p deploy'
                 sh 'cp target/*.jar deploy/'
                 echo 'Despliegue completado en la carpeta /deploy.'
             }
         }
-    }}
+    }
+
+    // -----------------------------------------
+    // NOTIFICACIONES POR CORREO (ÉXITO / ERROR)
+    // -----------------------------------------
+    post {
+
+        success {
+            emailext(
+                to: 'waltduchi@gmail.com',
+                subject: "Jenkins: Build EXITOSO del proyecto",
+                body: """
+                Hola Walter,
+
+                El pipeline terminó **correctamente** 
+
+                Proyecto: ${env.JOB_NAME}
+                Build #: ${env.BUILD_NUMBER}
+                Estado: ÉXITO
+                URL del build: ${env.BUILD_URL}
+
+                Saludos,
+                Jenkins 
+                """
+            )
+        }
+
+        failure {
+            emailext(
+                to: 'waltduchi@gmail.com',
+                subject: " Jenkins: Build FALLÓ",
+                body: """
+                Hola Walter,
+
+                El pipeline ha **fallado**
+
+                Proyecto: ${env.JOB_NAME}
+                Build #: ${env.BUILD_NUMBER}
+                Estado: ERROR
+                URL del build: ${env.BUILD_URL}
+
+                Revisa el log cuanto antes 
+                """
+            )
+        }
+
+        always {
+            emailext(
+                to: 'waltduchi@gmail.com',
+                subject: " Jenkins: Reporte de Tests del Build ${env.BUILD_NUMBER}",
+                body: """
+                Hola Walter,
+
+                Aquí tienes el reporte de pruebas del build ${env.BUILD_NUMBER}.
+
+                Proyecto: ${env.JOB_NAME}
+                URL del build: ${env.BUILD_URL}
+
+                Saludos,
+                Jenkins 
+                """
+            )
+        }
+    }
+}
