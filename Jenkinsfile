@@ -48,7 +48,7 @@ pipeline {
     }
 
     // -----------------------------------------
-    // NOTIFICACIONES POR CORREO (ÉXITO / ERROR)
+    // NOTIFICACIONES POR CORREO (ÉXITO / ERROR / SIEMPRE)
     // -----------------------------------------
     post {
 
@@ -57,55 +57,53 @@ pipeline {
                 to: 'waltduchi@gmail.com',
                 subject: "Jenkins: Build EXITOSO del proyecto",
                 body: """
-                Hola Walter,
-
-                El pipeline terminó **correctamente** 
-
-                Proyecto: ${env.JOB_NAME}
-                Build #: ${env.BUILD_NUMBER}
-                Estado: ÉXITO
-                URL del build: ${env.BUILD_URL}
-
-                Saludos,
-                Jenkins 
-                """
+                    <p>Hola Walter,</p>
+                    <p>El pipeline terminó <b>correctamente</b>.</p>
+                    <p>
+                    Proyecto: ${env.JOB_NAME}<br>
+                    Build #: ${env.BUILD_NUMBER}<br>
+                    Estado: ÉXITO<br>
+                    URL del build: <a href="${env.BUILD_URL}">${env.BUILD_URL}</a>
+                    </p>
+                    <p>Saludos,<br>Jenkins</p>
+                """,
+                mimeType: 'text/html'
             )
         }
 
         failure {
             emailext(
                 to: 'waltduchi@gmail.com',
-                subject: " Jenkins: Build FALLÓ",
+                subject: "Jenkins: Build FALLÓ",
                 body: """
-                Hola Walter,
-
-                El pipeline ha **fallado**
-
-                Proyecto: ${env.JOB_NAME}
-                Build #: ${env.BUILD_NUMBER}
-                Estado: ERROR
-                URL del build: ${env.BUILD_URL}
-
-                Revisa el log cuanto antes 
-                """
+                    <p>Hola Walter,</p>
+                    <p>El pipeline ha <b>fallado</b>.</p>
+                    <p>
+                    Proyecto: ${env.JOB_NAME}<br>
+                    Build #: ${env.BUILD_NUMBER}<br>
+                    Estado: ERROR<br>
+                    URL del build: <a href="${env.BUILD_URL}">${env.BUILD_URL}</a>
+                    </p>
+                    <p>Revisa el log cuanto antes.</p>
+                """,
+                mimeType: 'text/html'
             )
         }
 
         always {
             emailext(
                 to: 'waltduchi@gmail.com',
-                subject: " Jenkins: Reporte de Tests del Build ${env.BUILD_NUMBER}",
+                subject: "Jenkins: Reporte Build #${env.BUILD_NUMBER}",
                 body: """
-                Hola Walter,
-
-                Aquí tienes el reporte de pruebas del build ${env.BUILD_NUMBER}.
-
-                Proyecto: ${env.JOB_NAME}
-                URL del build: ${env.BUILD_URL}
-
-                Saludos,
-                Jenkins 
-                """
+                    <p>Hola Walter,</p>
+                    <p>El build #${env.BUILD_NUMBER} ha finalizado.</p>
+                    <p>
+                    Proyecto: ${env.JOB_NAME}<br>
+                    URL del build: <a href="${env.BUILD_URL}">${env.BUILD_URL}</a>
+                    </p>
+                    <p>Saludos,<br>Jenkins</p>
+                """,
+                mimeType: 'text/html'
             )
         }
     }
